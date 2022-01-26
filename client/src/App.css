@@ -1,0 +1,46 @@
+/*! App.tsx */
+.App {
+  /* height: 100%; */
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+.Nav {
+  flex: 0 1 5rem;
+  border: 1px solid black;
+}
+.Pages {
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+}
+/*! Home.tsx */
+.home-container {
+  /* width: 100%; */
+  flex: 0 1 50rem;
+  border: 1px solid black;
+}
+/*! About.tsx */
+.about-container {
+  flex: 0 1 50rem;
+}
+/*! Service.tsx */
+/*! Join.tsx */
+/*! Nav.tsx */
+.nav-container {
+  display: flex;
+  justify-content: space-between;
+  margin: 1rem 4rem;
+}
+.nav-r {
+}
+.nav-title {
+  cursor: pointer;
+}
+.nav-l {
+  display: flex;
+}
+.nav-pages {
+  margin: 0 2rem;
+  cursor: pointer;
+}
