@@ -2,34 +2,28 @@ import React from "react";
 import { Link } from "react-router-dom";
 const Nav = () => {
   return (
-    <nav className="navbar">
-      <div className="navbar__container">
-        <a href="#home" id="navbar__logo">
+    <nav className="nav">
+      <div className="nav-container">
+        <a href="#home" className="nav-title">
           COLOR
         </a>
-        <div className="navbar__toggle" id="mobile-menu">
-          <span className="bar"></span> <span className="bar"></span>
-          <span className="bar"></span>
+        <div id="mobile-menu">
+          <span className="menu-icon"></span>
+          <span className="menu-icon"></span>
+          <span className="menu-icon"></span>
         </div>
-        <ul className="navbar__menu">
-          <li className="navbar__item">
-            {/* <a href="#home" className="navbar__links" id="home-page">Home</a> */}
-            <Link to="/">Home</Link>
+        <ul className="nav-menu-box">
+          <li className="nav-menu" id="home-btn">
+            <a href="#home">Home</a>
           </li>
-          <li className="navbar__item">
-            <a href="#about" className="navbar__links" id="about-page">
-              About
-            </a>
+          <li className="nav-menu" id="about-btn">
+            <a href="#about">About</a>
           </li>
-          <li className="navbar__item">
-            <a href="#services" className="navbar__links" id="services-page">
-              Services
-            </a>
+          <li className="nav-menu" id="services-btn">
+            <a href="#services">Services</a>
           </li>
-          <li className="navbar__btn">
-            <a href="#sign-up" className="button" id="signup">
-              Sign Up
-            </a>
+          <li className="nav-menu" id="join-btn">
+            <a href="#join">Sign up</a>
           </li>
         </ul>
       </div>
