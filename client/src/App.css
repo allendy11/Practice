@@ -88,3 +88,35 @@
   color: #9518fc;
   transition: all 0.3s ease;
 }
+
+@media screen and (max-width: 960px) {
+  .nav-container {
+  }
+  .nav-menu-box {
+  }
+  .nav-menu-box.active {
+    background: #131313;
+    top: 100%;
+    opacity: 1;
+    transition: all 0.5s ease;
+    z-index: 99;
+    height: 60vh;
+    font-size: 1.6rem;
+  }
+  #mobile-menu {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 20%;
+    right: 5%;
+    transform: translate(5%, 20%);
+    cursor: pointer;
+  }
+  #mobile-menu .menu-icon {
+    width: 25px;
+    height: 3px;
+    margin: 3px auto;
+    transition: all 0.3s ease-in-out;
+    background: #fff;
+  }
+}
