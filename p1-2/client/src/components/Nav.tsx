@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useRef } from "react";
 
 const Nav = () => {
+  const handleClick = () => {};
   return (
     <div className="nav">
       <div className="nav-container">
