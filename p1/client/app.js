@@ -4,7 +4,6 @@ const navLogo = document.querySelector("#navbar__logo"); //! color
 
 // Display Mobile Menu
 const mobileMenu = () => {
-  console.log(menu.classList);
   menu.classList.toggle("is-active");
   menuLinks.classList.toggle("active");
 };
@@ -22,7 +21,6 @@ const highlightMenu = () => {
   // adds 'highlight' class to my menu items
   if (window.innerWidth > 960 && scrollPos < 600) {
     homeMenu.classList.add("highlight");
-    console.log(homeMenu.classList);
     aboutMenu.classList.remove("highlight");
     return;
   } else if (window.innerWidth > 960 && scrollPos < 1400) {
