@@ -125,7 +125,7 @@ a {
 
 /*! home */
 .section {
-  height: 50rem;
+  padding: 200px 0;
 }
 .home {
   background: linear-gradient(to right, #161616, #000000);
@@ -165,7 +165,6 @@ a {
 }
 .main_btn {
   font-size: 1.8rem;
-  color: #fff;
   background: -webkit-linear-gradient(to right, #fcb045, #fd1d1d, #833ab4);
   background: linear-gradient(to right, #fcb045, #fd1d1d, #833ab4);
   padding: 20px 60px;
@@ -175,11 +174,196 @@ a {
   position: relative;
   transition: all 0.35s;
 }
+.main_btn > span {
+  position: relative;
+  z-index: 2;
+  color: #fff;
+}
+.main_btn:after {
+  position: absolute;
+  content: "";
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 100%;
+  background: #ff1ead;
+  transition: all 0.35s;
+  border-radius: 4px;
+}
+.main_btn:hover {
+  color: #fff;
+}
+.main_btn:hover:after {
+  width: 100%;
+}
 @media screen and (max-width: 768px) {
   .home_heading {
     font-size: 4.3rem;
   }
   .home_description {
     font-size: 2.5rem;
+  }
+}
+
+/*! about section */
+.about {
+  background-color: #131313;
+  padding: 10rem 0;
+}
+.about_container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  justify-content: center;
+  align-items: center;
+  height: 90%;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 50px;
+  max-width: 1300px;
+}
+.fa-layer-group,
+.fa-users {
+  font-size: 14rem;
+  color: #fff;
+}
+.about_img_box {
+  background-image: linear-gradient(to right, #00dbde 0%, #fc00ff 100%);
+  width: 32rem;
+  height: 32rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+}
+.about_content {
+  width: 100%;
+}
+.about_content > h1 {
+  font-size: 2rem;
+  background-image: linear-gradient(to top, #ff087b 0%, #ed1a52 100%);
+  -webkit-background-clip: text;
+  -moz-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  -moz-text-fill-color: transparent;
+  text-transform: uppercase;
+  margin-bottom: 2rem;
+}
+.about_content > h2 {
+  font-size: 4rem;
+  background-image: linear-gradient(to right, #8f0eff, #da22ff);
+  -webkit-background-clip: text;
+  -moz-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  -moz-text-fill-color: transparent;
+}
+.about_content > p {
+  color: #fff;
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 1rem 0;
+}
+.about_btn {
+  margin: 1rem 0;
+}
+
+@media screen and (max-width: 1100px) {
+  .about_container {
+    display: flex;
+    flex-direction: column;
+    /* grid-template-columns: 1fr; */
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    margin: 0 auto;
+    height: 90%;
+  }
+  .about_img_box {
+    height: 425px;
+    width: 425px;
+  }
+  .about_content {
+    text-align: center;
+  }
+  .about_content > h1 {
+    font-size: 2.5rem;
+    margin-top: 2rem;
+  }
+  .about_content > h2 {
+    font-size: 3rem;
+  }
+  .about_content > p {
+    font-size: 1.5rem;
+    margin-top: 1rem;
+  }
+}
+.services {
+  background-color: #131313;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+.services > h1 {
+  background-color: #ff8177;
+  background-image: linear-gradient(to right, #ff0844 0%, #f7673c 100%);
+  background-size: 100%;
+  -webkit-background-clip: text;
+  -moz-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  -moz-text-fill-color: transparent;
+  margin-bottom: 5rem;
+  font-size: 2.5rem;
+}
+.services_container {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-template-rows: 1fr;
+}
+.services_card {
+  margin: 10px;
+  height: 425px;
+  width: 300px;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  color: #fff;
+  background-image: linear-gradient(to right, #00dbde 0%, #fc00ff 100%);
+  transition: 0.3s ease-in;
+}
+
+.services_card > h2 {
+  text-align: center;
+}
+
+.services_card > p {
+  text-align: center;
+  margin-top: 24px;
+  font-size: 20px;
+}
+.services_btn {
+  display: flex;
+  justify-content: center;
+  margin-top: 16px;
+}
+.services_btn > button {
+  color: #fff;
+  padding: 14px 24px;
+  border: none;
+  outline: none;
+  border-radius: 4px;
+  background: #131313;
+  font-size: 1rem;
+}
+@media screen and (max-width: 1300px) {
+  .services_container {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .services_container {
+    grid-template-columns: 1fr;
   }
 }
