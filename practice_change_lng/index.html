@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>i18n</title>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/i18next/17.0.18/i18next.min.js"
+      type="text/javascript"
+    ></script>
+  </head>
+  <body>
+    <select id="lang-select" onchange="i18next.changeLanguage(this.value)">
+      <option value="en">English</option>
+      <option value="ko">Korean</option>
+      <option value="fr">French</option>
+    </select>
+    <h1 id="title"></h1>
+    <p id="content"></p>
+    <script>
+      const isKorean = navigator.language === "ko-KR";
+      if (isKorean) {
+        document
+          .getElementById("lang-select")
+          .options[1].setAttribute("selected", true);
+      }
+      i18next.init(
+        {
+          lng: isKorean ? "ko" : "en",
+          debug: true,
+          resources: {
+            ko: {
+              translation: {
+                title: "안녕하세요",
+                content: "좋은 하루 되세요"
+              }
+            },
+            en: {
+              translation: {
+                title: "Hello",
+                content: "have a nice day"
+              }
+            },
+            fr: {
+              translation: {
+                title: "Bonjour",
+                content: "Passez une bonne journée!"
+              }
+            }
+          }
+        },
+        function(err, t) {
+          // init set content
+          if (err) {
+            console.error(err);
+          } else {
+            updateContent();
+          }
+        }
+      );
+
+      function updateContent() {
+        document.getElementById("title").innerHTML = i18next.t("title");
+        document.getElementById("content").innerHTML = i18next.t("content");
+      }
+
+      i18next.on("languageChanged", () => {
+        updateContent();
+      });
+    </script>
+  </body>
+</html>
