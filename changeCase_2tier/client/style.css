@@ -1,0 +1,16 @@
+.text_box {
+  margin: 1rem 0;
+}
+.text {
+  font-size: 1.5rem;
+}
+.text_input,
+.text_output {
+  resize: none;
+}
+.button_box button {
+  padding: 5px 10px;
+  cursor: pointer;
+  font-size: 1.2rem;
+  margin: 0 1rem;
+}
