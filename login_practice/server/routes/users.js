@@ -1,9 +1,9 @@
-var express = require('express');
-var router = express.Router();
-
+const express = require("express");
+const router = express.Router();
+const { signin, signup, signout } = require("../controllers");
 /* GET users listing. */
-router.get('/', function(req, res, next) {
-  res.send('respond with a resource');
-});
+router.post("/signin", signin);
+router.post("/signup", signup);
+router.signout("/signout", signout);
 
 module.exports = router;
