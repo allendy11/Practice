@@ -48,20 +48,109 @@ public class NCBIIndexer {
 		
 		
 		indexer.parse();
-		String word = "Buchnera Aphidicola Tabriz.1";
-		NCBITerm searchResult = indexer.searcher(word);
+		
+		
+		String searchWord = "Buchnera Aphidicola Tabriz.1";
+		NCBITerm searchResult = indexer.search(searchWord, false);
 		System.out.println("DocID: " + searchResult.docId);
 		System.out.println("TaxID: " + searchResult.taxId);
-		System.out.println("TaxDetail: " + searchResult.taxDetail);
+		System.out.println("TaxDetail: " + searchResult.taxDetail + "\n");
+		
+		
+		String addSpecies = "Test_Custom_Species_db2";
+		indexer.add_custom_species(addSpecies);
+		
+		
+		String removeSpecies = "Test_Custom_Species_db2";
+		indexer.remove_species(removeSpecies);
+		
+		
+//		NCBITerm maxTerm = indexer.getMaxDoc();
+//		System.out.println("MaxDocID: " + maxTerm.docId);
+//		System.out.println("MaxTaxID: " + maxTerm.taxId);
+//		System.out.println("MaxTaxDetail: " + maxTerm.taxDetail + "\n");
 		
 		indexer.closer();
 		
 	}
 
-	private NCBITerm searcher(String word) {
+	private void remove_species(String species) {
+		System.out.println("[remove_species]");
+		String exact_species = String.format("\"%s\"", species);
+		try {
+			query = new QueryParser("TaxDetail", analyzer).parse(exact_species);
+			NCBITerm term = search(species, true);
+			if(term.docId == -1) {
+				System.out.println("Not Found\n");
+				return;
+			}
+			
+			iw.deleteDocuments(query);
+			iw.commit();
+
+			System.out.println("RemovedDocID: " + term.docId);
+			System.out.println("RemovedTaxID: " + term.taxId);
+			System.out.println("RemovedTaxDetail: " + term.taxDetail + "\n");
+			
+		} catch (ParseException | IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+	
+
+	private void add_custom_species(String species) {
+		System.out.println("[add_custom_species]");
+		NCBITerm searchResult = search(species, true);
+		if(searchResult.docId != -1) {
+			System.out.println("Species name exists already \n");
+			return;
+		}
+		NCBITerm maxTerm = getMaxDoc();
+		int newDocId = maxTerm.docId +1;
+		String newTaxId = Integer.toString(Integer.parseInt(maxTerm.taxId) +1);
+		
+		Document doc = new Document();
+		doc.add(new StringField("TaxID", newTaxId, Store.YES));
+		doc.add(new TextField("TaxDetail", species, Store.YES));
+		
+		try {
+			iw.addDocument(doc);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		System.out.println("AddDocId: " + newDocId);
+		System.out.println("AddTaxID: " + newTaxId);
+		System.out.println("AddTaxDetail: " + species + "\n");
+	}
+
+	private NCBITerm getMaxDoc() {
+		int maxDocId = ir.maxDoc()-1;
+		String maxTaxId = "";
+		String maxTaxDetail ="";
+		try {
+			maxTaxId = ir.document(maxDocId).get("TaxID");
+			maxTaxDetail = ir.document(maxDocId).get("TaxDetail");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}	
+		return new NCBITerm(maxDocId, maxTaxId, maxTaxDetail);
+	}
+
+	private NCBITerm search(String word, boolean exactMatch) {
+		System.out.println("[search]");
 		try {
 			int hitsPerPage = 10;
-			query = new QueryParser("TaxDetail", analyzer).parse(word);
+			if(exactMatch) {
+				String exact_species = String.format("\"%s\"", word);
+				query = new QueryParser("TaxDetail", analyzer).parse(exact_species);
+			} else {
+				query = new QueryParser("TaxDetail", analyzer).parse(word);				
+			}
 			IndexSearcher searcher = new IndexSearcher(ir);
 			TopDocs topDocs = searcher.search(query, hitsPerPage);
 			ScoreDoc[] hits = topDocs.scoreDocs;
@@ -79,25 +168,31 @@ public class NCBIIndexer {
 	}
 
 	private void closer() {
+		System.out.println("[closer]");
 		try {
 			if(this.iw != null) {
+				System.out.println("IndexWriter closed");
 				this.iw.close();				
 			}
 			if(this.ir != null) {
+				System.out.println("IndexReader closed");
 				this.ir.close();				
 			}
 			if(this.reader != null) {
+				System.out.println("BufferedReader closed");
 				this.reader.close();
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		System.out.println("");
 	}
 
 
 
 	private void loader() {
+		System.out.println("[loader]\n");
 		try {
 			this.index = FSDirectory.open(Paths.get(output_path));
 			this.analyzer = new StandardAnalyzer();
