@@ -209,8 +209,8 @@ void shopping::add(){
 void shopping::test()
 {
 m:
-  ofstream wtest("./test.txt");
-  ifstream itest("./test.txt");
+  fstream test;
+  string code;
   string name;
   int price;
   int choice;
@@ -225,18 +225,64 @@ m:
   switch (choice)
   {
   case 1:
+    test.open("./test.txt", ios::app);
+    if (!test)
+    {
+      cout << "Create <test.txt> ..." << endl;
+    }
     cout << "Input Infomation" << endl;
+    cout << "code : ";
+    cin >> code;
     cout << "name : ";
     cin >> name;
     cout << "price : ";
     cin >> price;
+    test << code << " | " << name << " | " << price << endl;
+    test.close();
+    cout << "Finished." << endl;
+    cout << "1) Go to menu" << endl;
+    cout << "2) Exit" << endl;
+    cout << "Please select : ";
+    cin >> choice;
+    if (choice == 1)
+    {
+      goto m;
+    }
+    cout << "Test closed" << endl;
     break;
   case 2:
+    test.open("./test.txt", ios::in);
+    char c;
+    while (test.get(c))
+    {
+      cout << c;
+    }
+    test.close();
+    cout << "Finished." << endl;
+    cout << "1) Go to menu" << endl;
+    cout << "2) Exit" << endl;
+    cout << "Please select : ";
+    cin >> choice;
+    if (choice == 1)
+    {
+      goto m;
+    }
+    cout << "Test closed" << endl;
     break;
   case 3:
+    cout << "Finished." << endl;
+    cout << "1) Go to menu" << endl;
+    cout << "2) Exit" << endl;
+    cout << "Please select : ";
+    cin >> choice;
+    if (choice == 1)
+    {
+      goto m;
+    }
+    cout << "Test closed" << endl;
     break;
   case 4:
-    cout << "test closed" << endl;
+    cout << "Test closed" << endl;
     break;
   default:
     cout << "Invalid choice" << endl;
