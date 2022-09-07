@@ -307,18 +307,18 @@ void shopping::list()
   data >> pcode >> pname >> price >> dis;
   while (!data.eof())
   {
-    cout << pcode < "\t\t" << pname << "\t\t" << price << "\n";
+    cout << pcode << "\t\t" << pname << "\t\t" << price << "\n";
     data >> pcode >> pname >> price >> dis;
   }
   data.close();
 }
 
-void shopping receipt()
+void shopping::receipt()
 {
   fstream data;
   int arrc[100];
   int arrq[100];
-  char choice;
+  string choice;
   int c = 0;
   float amount = 0;
   float dis = 0;
@@ -383,8 +383,8 @@ void shopping receipt()
   cout << "\n\n___________\n";
   cout << "\n Total Amount : " << total;
 }
-int main
+int main()
 {
   shopping s;
   s.menu();
-}
+};
