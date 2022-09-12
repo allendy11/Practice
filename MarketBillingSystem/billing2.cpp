@@ -272,7 +272,18 @@ m:
   string icode;
 
   //	int i;
-  //	fstream test;
+  fstream test;
+  test.open("./test.txt", ios::in);
+  char str[100];
+  if (!test.getline(str, sizeof(str)))
+  {
+    cout << " ___________________________ " << endl;
+    cout << "|                           |" << endl;
+    cout << "|       DB Not Exist        |" << endl;
+    cout << "|___________________________|" << endl;
+    test.close();
+    shopping::admin();
+  }
 
   cout << " ___________________________ " << endl;
   cout << "|                           |" << endl;
@@ -289,7 +300,7 @@ m:
 
   if (pcode == "")
   {
-    cout << "Not found1" << endl;
+    cout << "Not found" << endl;
   }
   else
   {
@@ -433,9 +444,30 @@ void shopping::modify()
   cout << "|___________________________|" << endl;
 }
 
-void shopping::del(){};
+void shopping::del()
+{
+}
+
+void shopping::test()
+{
+  //
+m:
+  //
+  int choice;
+  fstream test;
+  test.open("./test.txt", ios::in);
+  char str[100];
+  if (test.getline(str, sizeof(str)))
+  {
+    cout << "exist" << endl;
+  }
+  else
+  {
+    cout << "not exist" << endl;
+  }
+}
 int main()
 {
   shopping s;
-  s.menu();
+  s.admin();
 }
