@@ -446,6 +446,44 @@ void shopping::modify()
 
 void shopping::del()
 {
+  //
+m:
+  //
+  int choice;
+  fstream test;
+  string icode;
+  test.open("./test.txt", ios::in);
+  char str[100];
+  if (!test.getline(str, sizeof(str)))
+  {
+    cout << " ___________________________ " << endl;
+    cout << "|                           |" << endl;
+    cout << "|       DB Not Exist        |" << endl;
+    cout << "|___________________________|" << endl;
+    test.close();
+    shopping::admin();
+  }
+  while (test.getline(str, sizeof(str)))
+  {
+    istringstream iss(str);
+    char separator = '|';
+    string s;
+    string arr[3];
+    int i = 0;
+    while (getline(iss, s, separator))
+    {
+      regex r("\\s+");
+      s = regex_replace(s, r, "");
+      arr[i++] = s;
+    }
+    pcode = arr[0];
+  }
+  cout << " ___________________________ " << endl;
+  cout << "|                           |" << endl;
+  cout << "|      Delete Product       |" << endl;
+  cout << "|___________________________|" << endl;
+  cout << "Insert Product Code : ";
+  cin >> icode;
 }
 
 void shopping::test()
