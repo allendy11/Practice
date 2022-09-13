@@ -1,0 +1,12 @@
+create lucene_combined.a
+addlib "/home/neuroears/git/NCBIIndexer_C++/lucene/liblucene.a"
+addlib /usr/lib/x86_64-linux-gnu/libboost_system.a
+addlib /usr/lib/x86_64-linux-gnu/libboost_data_time.a
+addlib /usr/lib/x86_64-linux-gnu/libboost_filesystem.a
+addlib /usr/lib/x86_64-linux-gnu/libboost_regex.a
+addlib /usr/lib/x86_64-linux-gnu/libboost_thread.a
+addlib /usr/lib/x86_64-linux-gnu/libboost_iostreams.a
+addlib /usr/lib/x86_64-linux-gnu/libpthread.a
+addlib /usr/lib/x86_64-linux-gnu/libz.a
+save
+end
