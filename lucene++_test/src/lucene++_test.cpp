@@ -7,6 +7,8 @@
 //============================================================================
 
 #include <iostream>
+#include "NCBIIndexer.hpp"
+
 using namespace std;
 
 int main() {
