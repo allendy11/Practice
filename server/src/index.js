@@ -1,31 +1,42 @@
 const Koa = require("koa");
 const Router = require("koa-router");
-const logger = require("koa-logger");
+const bodyParser = require("koa-bodyparser");
 
 const { server_env } = require("./config/config");
+const logger = require("./config/logger");
 
-const userRouter = require("./routes/userRouter");
-const testRouter = require("./routes/testRouter");
+const authRouter = require("./routes/auth");
+const testRouter = require("./routes/test");
+
 const app = new Koa();
 const router = new Router();
 
-// Middleware: Logger
-app.use(logger());
+const NAMESPACE = "Server";
+
+// Middleware
+app.use(bodyParser());
 
 // init
 app.use((ctx, next) => {
-  ctx.body = "Hello, world!";
-  console.log("Hello, world!");
+  logger.info(NAMESPACE, `[method: ${ctx.method}] [path: ${ctx.path}]`);
+  ctx.body = "Hello world";
+  ctx.res.on("finish", () => {
+    logger.end(
+      NAMESPACE,
+      `[status: ${ctx.res.statusCode}] [${ctx.res.statusMessage}]`
+    );
+  });
   next();
 });
 
 // Routes : home
 router.get("/", (ctx, next) => {
-  ctx.body = "home";
+  console.log("home");
+  ctx.body = "Welcome home";
 });
 
 // Routes : user
-router.use("/user", userRouter.routes());
+router.use("/auth", authRouter.routes());
 
 // Routes : test
 router.use("/test", testRouter.routes());
