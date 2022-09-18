@@ -9,7 +9,7 @@ const env = {
   port: mysql_env.port,
 };
 
-const connect = () => {
+const Connect = () => {
   return new Promise((resolve, reject) => {
     const connection = mysql.createConnection(env);
 
@@ -22,5 +22,27 @@ const connect = () => {
     });
   });
 };
-
-module.exports = { connect };
+const Query = (connection, query, params = null) => {
+  if (params) {
+    return new Promise((resolve, reject) => {
+      connection.query(query, params, (error, result) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(result);
+        }
+      });
+    });
+  } else {
+    return new Promise((resolve, reject) => {
+      connection.query(query, (error, result) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(result);
+        }
+      });
+    });
+  }
+};
+module.exports = { Connect, Query };
