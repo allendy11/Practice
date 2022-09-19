@@ -6,7 +6,7 @@ const server_port = process.env.SERVER_PORT || "4000";
 const token_issuer = process.env.TOKEN_ISSUER || "root";
 const token_secret = process.env.TOKEN_SECRET || "secret";
 const token_expire_time = process.env.TOKEN_EXPIRE_TIME || "10m";
-const hash_salt = process.env.HASH_SALT || 10;
+const hash_salt = process.env.HASH_SALT || "10";
 
 const server_env = {
   host: server_host,
@@ -17,7 +17,7 @@ const server_env = {
     expireTime: token_expire_time,
   },
   hash: {
-    salt: hash_salt,
+    salt: parseInt(hash_salt),
   },
 };
 
