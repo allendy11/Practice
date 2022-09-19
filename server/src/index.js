@@ -19,7 +19,6 @@ app.use(bodyParser());
 // init
 app.use((ctx, next) => {
   logger.info(NAMESPACE, `[method: ${ctx.method}] [path: ${ctx.path}]`);
-  ctx.body = "Hello world";
   ctx.res.on("finish", () => {
     logger.end(
       NAMESPACE,
@@ -40,6 +39,15 @@ router.use("/auth", authRouter.routes());
 
 // Routes : test
 router.use("/test", testRouter.routes());
+
+// error 404: not found path
+// app.use((ctx, next) => {
+//   console.log();
+//   const err = new Error("NOT FOUND");
+//   err.status = 404;
+//   err.expose = true;
+//   throw err;
+// });
 
 // SET router
 app.use(router.routes()).use(router.allowedMethods());

@@ -1,5 +1,5 @@
 const bcryptjs = require("bcryptjs");
-const { Connect } = require("../config/mysql");
+const { Connect, Query } = require("../config/mysql");
 const { server_env } = require("../config/config");
 const logger = require("../config/logger");
 
@@ -16,11 +16,12 @@ const register = async (ctx, next) => {
       logger.error(NAMESPACE, error.message);
     } else {
       // console.log(hash);
-      const query = "INSERT INTO users (name, email, password) values (?,?,?)";
+      const query = "INSERT INTO Users (name, email, password) values (?,?,?)";
       const params = [name, email, hash];
       Connect().then((connection) => {
         Query(connection, query, params).then((result) => {
           console.log(result);
+          ctx.body = "work";
         });
       });
     }
