@@ -56,7 +56,7 @@ int main()
     vector<string> result;
     boost::split(result, line, boost::is_any_of("\\|"));
 
-    for (int i = 0; i < result.size(); i++)
+    for (int32_t i = 0; i < result.size(); i++)
     {
       boost::trim(result[i]);
     }

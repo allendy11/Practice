@@ -27,4 +27,7 @@ int main()
   indexer.set_index_directory(output_directory_index_str);
 
   indexer.parse();
+  String tax_id = indexer.search(L"Buchnera aphidicola Tabriz.1");
+
+  cout << "taxId: " << tax_id << endl;
 }
