@@ -26,6 +26,17 @@ int main()
   indexer.set_input_path(input_path);
   indexer.set_index_directory(output_directory_index);
 
+  cout << "[Parse] ";
   indexer.parse();
+
+  cout << endl;
+
+  cout << "[Search] ";
   String tax_id = indexer.search(L"Buchnera aphidicola Tabriz.1");
+
+  cout << endl;
+
+  cout << "[Add] ";
+  indexer.add_custom_species(L"Buchnera aphidicola");
+  //	indexer.add_custom_species(L"Test_Custom_Species_db1");
 }
