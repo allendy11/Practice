@@ -30,15 +30,16 @@ class NCBIIndexer
 public:
   NCBIIndexer();
   virtual ~NCBIIndexer();
-  void set_input_path(string path);
-  void set_index_directory(string path);
+  void set_input_path(String path);
+  void set_index_directory(String path);
   void parse();
   String search(String species);
-  DocumentPtr fileDocument(string taxId, string taxDetail);
+  DocumentPtr fileDocument(String taxId, String taxDetail);
+  void add_custom_species(String species);
 
 private:
-  string input_path;
-  string output_directory_index;
+  String input_path;
+  String output_directory_index;
 };
 
 #endif /* NCBIINDEXER_HPP_ */

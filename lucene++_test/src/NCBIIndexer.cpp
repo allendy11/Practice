@@ -115,24 +115,55 @@ String NCBIIndexer::search(String species)
     searcher->search(query, collector);
     Collection<ScoreDocPtr> hits = collector->topDocs()->scoreDocs;
     int32_t numTotalHits = collector->getTotalHits();
-    wcout << numTotalHits << L" total matching documents\n";
-
-    for (int32_t i = 0; i < hitsPerPage; i++)
+    if (numTotalHits > 0)
     {
-      int docId = hits[i]->doc;
-      DocumentPtr doc = searcher->doc(docId);
-      String taxId = doc->get(field_taxId);
-      String taxDetail = doc->get(field_taxDetail);
-      wcout << L"docId: " << docId << L"\n";
-      wcout << L"taxId: " << taxId << L"\n";
-      wcout << L"taxDetail: " << taxDetail << L"\n";
-      return taxId;
+      wcout << numTotalHits << L" total matching documents\n";
+      for (int32_t i = 0; i < hitsPerPage; i++)
+      {
+        int docId = hits[i]->doc;
+        DocumentPtr doc = searcher->doc(docId);
+        String taxId = doc->get(field_taxId);
+        String taxDetail = doc->get(field_taxDetail);
+        wcout << L"docId: " << docId << L"\n";
+        wcout << L"taxId: " << taxId << L"\n";
+        wcout << L"taxDetail: " << taxDetail << L"\n";
+        return taxId;
+      }
+    }
+    else
+    {
+      wcout << L"Can't matching document : " << species << L"\n";
     }
     reader->close();
   }
   catch (LuceneException &e)
   {
     wcout << L"Eception: " << e.getError() << L"\n";
-    return L"";
   }
+  return L"-1";
+}
+void NCBIIndexer::add_custom_species(String species)
+{
+  // change format species for exact match
+  string exact_species_str = "\"" + StringUtils::toUTF8(species) + "\"";
+  String exact_species_unicode = StringUtils::toUnicode(exact_species_str);
+  String tax_id = NCBIIndexer::search(exact_species_unicode);
+  //	wcout << StringUtils::toInt(tax_id) << L"\n";
+  // already exist
+  if (StringUtils::toInt(tax_id) != -1)
+  {
+    wcout << L"Exist already: " << species << L"\n";
+  }
+
+  IndexWriterPtr writer = newLucene<IndexWriter>(
+      FSDirectory::open(output_directory_index),
+      newLucene<StandardAnalyzer>(LuceneVersion::LUCENE_CURRENT), true,
+      IndexWriter::MaxFieldLengthLIMITED);
+  IndexReaderPtr reader = IndexReader::open(
+      FSDirectory::open(output_directory_index), true);
+
+  // get newTaxId = maxTaxId +1 (need maxDocId)
+  int32_t maxDocId = reader->maxDoc() - 1;
+  String maxTaxId = reader->document(maxDocId)->get(L"TaxID");
+  writer->addDocument(NCBIIndexer::fileDocument(maxTaxId, species));
 }
