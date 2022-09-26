@@ -37,7 +37,7 @@ public:
   DocumentPtr fileDocument(String taxId, String taxDetail);
   String search(String species);
   void add_custom_species(String species);
-  int32_t getMaxDoc();
+  void getMaxDoc();
   void delete_custom_species(String species);
 
 private:
