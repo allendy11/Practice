@@ -39,6 +39,7 @@ public:
   void add_custom_species(String species);
   void getMaxDoc();
   void delete_custom_species(String species);
+  void searchByDocId(int docId);
 
 private:
   String input_path;

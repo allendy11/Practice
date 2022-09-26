@@ -245,3 +245,13 @@ void NCBIIndexer::delete_custom_species(String species)
     wcout << L"Eception: " << e.getError() << L"\n";
   }
 }
+void NCBIIndexer::searchByDocId(int docId)
+{
+  DirectoryPtr index = FSDirectory::open(output_directory_index);
+  IndexReaderPtr reader = IndexReader::open(index, true);
+  String taxId = reader->document(docId)->get(L"TaxID");
+  String taxDetail = reader->document(docId)->get(L"TaxDetail");
+  wcout << L"DocId: " << docId << endl;
+  wcout << L"TaxId: " << taxId << endl;
+  wcout << L"TaxDetail: " << taxDetail << endl;
+}

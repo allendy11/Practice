@@ -64,4 +64,8 @@ int main()
   //	maxDocId: 2438086
   //	maxTaxId: 2971678
   //	maxTaxDetail: Melanina Melanina <ascomycete fungi>
+
+  cout << "[NumDoc]" << endl;
+  indexer.searchByDocId(2438090);
+  cout << endl;
 }
