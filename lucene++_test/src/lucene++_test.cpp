@@ -22,12 +22,14 @@ int main()
       "/home/allen/eclipse-workspace/lucene/ncbi_index_plus_plus";
   String output_directory_index = StringUtils::toUnicode(
       output_directory_index_str);
+
   NCBIIndexer indexer;
+
   indexer.set_input_path(input_path);
   indexer.set_index_directory(output_directory_index);
 
   cout << "[Parse]" << endl;
-  //	indexer.parse();
+  indexer.parse();
   cout << endl;
 
   //	cout << "[Load]" << endl;
@@ -43,11 +45,17 @@ int main()
   cout << "[Add]" << endl;
   //	indexer.add_custom_species(L"Buchnera aphidicola Tabriz.1");
   //	indexer.add_custom_species(L"Buchnera aphidicola");
-  //	indexer.add_custom_species(L"Test_Custom_Species_db1");
+  indexer.add_custom_species(L"Test_Custom_Species_db1");
+  indexer.add_custom_species(L"Test_Custom_Species_db2");
+  indexer.add_custom_species(L"Test_Custom_Species_db3");
+  indexer.add_custom_species(L"Test_Custom_Species_db4");
   cout << endl;
 
   cout << "[Delete]" << endl;
   //	indexer.delete_custom_species(L"Test_Custom_Species_db1");
+  //	indexer.delete_custom_species(L"Test_Custom_Species_db2");
+  //	indexer.delete_custom_species(L"Test_Custom_Species_db3");
+  //	indexer.delete_custom_species(L"Test_Custom_Species_db4");
   cout << endl;
 
   cout << "[MaxDoc]" << endl;

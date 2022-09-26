@@ -30,49 +30,48 @@ void NCBIIndexer::parse()
 {
   HashSet<String> dirList(HashSet<String>::newInstance());
   FileUtils::listDirectory(output_directory_index, true, dirList);
-  if (dirList.size() > 0)
+  if (dirList.size() > 5)
   {
     cout << "Parsing already" << endl;
     return;
   }
   int64_t start = MiscUtils::currentTimeMillis();
-
-  IndexWriterPtr writer = newLucene<IndexWriter>(
-      FSDirectory::open(output_directory_index),
-      newLucene<StandardAnalyzer>(LuceneVersion::LUCENE_CURRENT), true,
-      IndexWriter::MaxFieldLengthLIMITED);
-
+  DirectoryPtr index = FSDirectory::open(output_directory_index);
+  AnalyzerPtr analyzer = newLucene<StandardAnalyzer>(
+      LuceneVersion::LUCENE_CURRENT);
+  IndexWriterPtr writer = newLucene<IndexWriter>(index, analyzer, true,
+                                                 IndexWriter::MaxFieldLengthLIMITED);
   boost::filesystem::fstream data;
   data.open(input_path, ios::in);
   string line;
-
   while (getline(data, line))
   {
     if (line.find("scientific name") == string::npos)
     {
       continue;
     }
-    vector<string> list;
-    boost::split(list, line, boost::is_any_of("\\|"));
+    vector<string> arr;
+    boost::split(arr, line, boost::is_any_of("\\|"));
 
-    for (long unsigned int i = 0; i < list.size(); i++)
+    for (long unsigned int i = 0; i < arr.size(); i++)
     {
-      boost::trim(list[i]);
+      boost::trim(arr[i]);
     }
-    string taxId_str = list[0];
-    string taxDetail_str = list[1];
-    string subTaxDetail_str = list[2];
+
+    string taxId_str = arr[0];
+    string taxDetail_str = arr[1];
+    string subTaxDetail_str = arr[2];
 
     if (!subTaxDetail_str.empty())
     {
       taxDetail_str += " " + subTaxDetail_str;
     }
+    //		cout << taxId << " " << taxDetail << endl;
     String taxId = StringUtils::toUnicode(taxId_str);
     String taxDetail = StringUtils::toUnicode(taxDetail_str);
 
-    writer->addDocument(fileDocument(taxId, taxDetail));
+    writer->addDocument(NCBIIndexer::fileDocument(taxId, taxDetail));
   }
-  //	writer->optimize();
   writer->close();
   int64_t time = (MiscUtils::currentTimeMillis() - start) / 1000;
   int64_t min = time / 60;
@@ -80,7 +79,6 @@ void NCBIIndexer::parse()
   cout << "Parsing finised" << endl;
   wcout << L"Time: " << min << L"m " << sec << L"s\n";
 }
-
 DocumentPtr NCBIIndexer::fileDocument(String taxId, String taxDetail)
 {
   DocumentPtr doc = newLucene<Document>();
@@ -92,17 +90,18 @@ DocumentPtr NCBIIndexer::fileDocument(String taxId, String taxDetail)
                        Field::INDEX_ANALYZED));
   return doc;
 }
+
 String NCBIIndexer::search(String species)
 {
   String result_taxId = L"-1";
   int32_t hitsPerPage = 10;
   try
   {
-    IndexReaderPtr reader = IndexReader::open(
-        FSDirectory::open(output_directory_index), true);
-    SearcherPtr searcher = newLucene<IndexSearcher>(reader);
+    DirectoryPtr index = FSDirectory::open(output_directory_index);
     AnalyzerPtr analyzer = newLucene<StandardAnalyzer>(
         LuceneVersion::LUCENE_CURRENT);
+    IndexReaderPtr reader = IndexReader::open(index, true);
+    SearcherPtr searcher = newLucene<IndexSearcher>(reader);
     QueryParserPtr parser = newLucene<QueryParser>(
         LuceneVersion::LUCENE_CURRENT, L"TaxDetail", analyzer);
 
@@ -163,13 +162,12 @@ void NCBIIndexer::add_custom_species(String species)
       return;
     }
     wcout << L"Add start: " << species << endl;
-
-    IndexWriterPtr writer = newLucene<IndexWriter>(
-        FSDirectory::open(output_directory_index),
-        newLucene<StandardAnalyzer>(LuceneVersion::LUCENE_CURRENT),
-        true, IndexWriter::MaxFieldLengthLIMITED);
-    IndexReaderPtr reader = IndexReader::open(
-        FSDirectory::open(output_directory_index), true);
+    DirectoryPtr index = FSDirectory::open(output_directory_index);
+    AnalyzerPtr analyzer = newLucene<StandardAnalyzer>(
+        LuceneVersion::LUCENE_CURRENT);
+    IndexWriterPtr writer = newLucene<IndexWriter>(index, analyzer, false,
+                                                   IndexWriter::MaxFieldLengthLIMITED);
+    IndexReaderPtr reader = IndexReader::open(index, true);
 
     int32_t maxDocId = reader->maxDoc() - 1;
     String maxTaxId = reader->document(maxDocId)->get(L"TaxID");
@@ -193,8 +191,9 @@ void NCBIIndexer::add_custom_species(String species)
 }
 void NCBIIndexer::getMaxDoc()
 {
-  IndexReaderPtr reader = IndexReader::open(
-      FSDirectory::open(output_directory_index), true);
+  DirectoryPtr index = FSDirectory::open(output_directory_index);
+  IndexReaderPtr reader = IndexReader::open(index, true);
+
   int32_t maxDocId = reader->maxDoc() - 1;
   if (maxDocId == -1)
   {
@@ -210,7 +209,6 @@ void NCBIIndexer::getMaxDoc()
   reader->close();
   return;
 }
-
 void NCBIIndexer::delete_custom_species(String species)
 {
   String s = StringUtils::toUnicode(
@@ -223,15 +221,13 @@ void NCBIIndexer::delete_custom_species(String species)
   }
   try
   {
-    IndexWriterPtr writer = newLucene<IndexWriter>(
-        FSDirectory::open(output_directory_index),
-        newLucene<StandardAnalyzer>(LuceneVersion::LUCENE_CURRENT),
-        true, IndexWriter::MaxFieldLengthLIMITED);
-    IndexReaderPtr reader = IndexReader::open(
-        FSDirectory::open(output_directory_index), true);
-    SearcherPtr searcher = newLucene<IndexSearcher>(reader);
+    DirectoryPtr index = FSDirectory::open(output_directory_index);
     AnalyzerPtr analyzer = newLucene<StandardAnalyzer>(
         LuceneVersion::LUCENE_CURRENT);
+    IndexWriterPtr writer = newLucene<IndexWriter>(index, analyzer, false,
+                                                   IndexWriter::MaxFieldLengthLIMITED);
+    IndexReaderPtr reader = IndexReader::open(index, true);
+    SearcherPtr searcher = newLucene<IndexSearcher>(reader);
     QueryParserPtr parser = newLucene<QueryParser>(
         LuceneVersion::LUCENE_CURRENT, L"TaxDetail", analyzer);
 
