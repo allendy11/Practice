@@ -1,5 +1,17 @@
-.DS_Store
-.vscode
-.env
+# dependencies
 node_modules
 package-lock.json
+
+# misc
+DS_Store
+.vscode
+.env
+
+# lib
+contrib
+lucene++
+core
+
+# other project (trash)
+server
+foo.java
