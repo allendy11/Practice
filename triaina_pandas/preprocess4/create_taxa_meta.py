@@ -8,12 +8,22 @@ import os
 import pandas as pd
 from preprocess.FTPConnection import FTPConnection
 
-def create_pkl(df, taxa):
-    output_path = f"/home/allen/data_mount/study/data/NCBI_DH/{taxa}.pkl"
+def create_pkl(df, taxa, id):
+    pkl_name = None
+    if id == None:
+        pkl_name = f"{taxa}.pkl"
+    else:
+        pkl_name = f"{taxa}-{id}.pkl"
+    output_path = f"/home/allen/data_mount/study/data/NCBI_DH/{pkl_name}"
     df.to_pkl(output_path)
     
-def create_tsv(df, taxa):
-    output_path = f"/home/allen/data_mount/study/data/NCBI_DH/{taxa}.tsv"
+def create_tsv(df, taxa, id):
+    tsv_name = None 
+    if id == None:
+        tsv_name = f"{taxa}.tsv"
+    else:
+        tsv_name = f"{taxa}-{id}.tsv"
+    output_path = f"/home/allen/data_mount/study/data/NCBI_DH/{tsv_name}"
     df.to_csv(output_path, sep='\t', index=False)
     
 def is_downloaded(row, ftp_con):
@@ -47,7 +57,7 @@ def set_local_path(ftp_path, taxa):
     return local_path
 
 
-def download_taxa_data(df, id=None):
+def download_taxa_data(df, taxa, id=None):
     host = "ftp.ncbi.nlm.nih.gov"
     ftp_con = FTPConnection()
     ftp_con.set_host(host)
@@ -55,6 +65,10 @@ def download_taxa_data(df, id=None):
     ftp_con.close()
     
     list = ["assembly_accession", "taxid", "species_taxid", "organism_name", "infraspecific_name", "ftp_path", "local_path", "is_downloaded"]
+    view = df[list]
+    df = view.copy()
+    
+    create_tsv(df, taxa, id)
     
     return df[list]
     
@@ -99,6 +113,6 @@ if __name__ == '__main__':
     for taxa in taxa_list:
         df = create_taxa_meta(taxa)
         df = modify_taxa_meta(df, taxa)
-        df = download_taxa_data(df)
-        create_tsv(df)
+        df = download_taxa_data(df, taxa)
+    
         break
