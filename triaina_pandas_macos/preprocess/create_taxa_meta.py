@@ -61,9 +61,13 @@ def modify_taxa_meta(df, taxa):
     return df
 
 
-def is_downloaded(row, ftp_con, taxa):
-    print(taxa, end=" ")
-    print(row.name, end=" ")
+def is_downloaded(row, ftp_con, taxa, p_id, df_len):
+    if p_id == None:
+        print(taxa, end=" ")
+        print(row.name, end=" ")
+    else:
+        print(f"{taxa}-{p_id}", end=" ")
+        print(f"{int(row.name) - (int(p_id) * int(df_len))}", end=" ")
 
     output_path = row["local_path"]
     file_name = os.path.basename(output_path)
@@ -104,14 +108,18 @@ def create_data_file(file_type, df, taxa, p_id):
 
 
 def download_taxa_data(df, taxa, p_id=None):
-    print(len(df))
+    df_len = len(df)
+    if p_id == None:
+        print(f"OneCore-{df_len}")
+    else:
+        print(f"core{p_id}-{df_len}")
     host = "ftp.ncbi.nlm.nih.gov"
     ftp_con = FTPConnection()
     ftp_con.set_host(host)
     ftp_con.connect()
 
-    df["is_downloaded"] = df.apply(
-        lambda row: is_downloaded(row, ftp_con, taxa), axis=1)
+    df["is_downloaded"] = df.apply(lambda row: is_downloaded(
+        row, ftp_con, taxa, p_id, df_len), axis=1)
 
     ftp_con.close()
 
