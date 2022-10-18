@@ -39,10 +39,13 @@ class FTPConnection:
         return size
 
     def download(self, output_path, remote_path):
+        local_size = None
+        if os.path.exists(output_path):
+            local_size = os.path.getsize(output_path)
         remote_size = self.get_size(remote_path)
-        local_size = os.path.getsize(output_path)
         if remote_size == local_size:
             return
+
         while True:
             with open(output_path, 'wb') as fin:
                 try:
