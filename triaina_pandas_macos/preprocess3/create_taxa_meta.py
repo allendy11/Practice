@@ -61,7 +61,10 @@ def get_size(ftp, row, taxa, p_id):
     remote_dir = (row["ftp_path"].split(sep='/', maxsplit=3))[-1]
     remote_path = f"{remote_dir}/{file_name}"
 
-    remote_size = ftp.get_size(remote_path)
+    try:
+        remote_size = ftp.get_size(remote_path)
+    except:
+        print(f"{p_id} - {row.name} : {file_name}")
     print(f"{taxa}_{p_id} {row.name}")
     row["remote_path"] = remote_path
     row["remote_size"] = remote_size
@@ -82,6 +85,9 @@ def get_remote_size(output_path, df, taxa, p_id=None, is_purge=False):
     if os.path.exists(tsv_path) and not is_purge:
         df = pd.read_csv(tsv_path, sep='\t')
         return df
+
+    tsv_tmp_path = f"{tsv_path}.tmp"
+    df.to_csv(tsv_tmp_path, sep='\t', index=False)
 
     host = "ftp.ncbi.nlm.nih.gov"
     ftp_con = FTPConnection()
