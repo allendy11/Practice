@@ -11,7 +11,7 @@ from pickle import NONE
 
 
 def set_local_path(ftp_path, taxa):
-    local_dir = f"/home/neuroears/data_mount/study/data/NCBI/{taxa}"
+    local_dir = f"/Volumes/study/data/NCBI/{taxa}"
     file_name = os.path.basename(ftp_path)
     local_path = f"{local_dir}/{file_name}_genomic.fna.gz"
     return local_path
