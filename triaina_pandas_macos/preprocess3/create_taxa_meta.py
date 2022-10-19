@@ -61,8 +61,11 @@ def get_size(ftp, row, taxa, p_id):
     remote_dir = (row["ftp_path"].split(sep='/', maxsplit=3))[-1]
     remote_path = f"{remote_dir}/{file_name}"
 
-    remote_size = ftp.get_size(remote_path)
-    print(f"{taxa}_{p_id} {row.name} : {file_name}")
+    try:
+        remote_size = ftp.get_size(remote_path)
+    except:
+        print(f"{p_id} - {row.name} : {file_name}")
+    print(f"{taxa}_{p_id} {row.name}")
     row["remote_path"] = remote_path
     row["remote_size"] = remote_size
 
@@ -76,28 +79,23 @@ def get_size(ftp, row, taxa, p_id):
 
 
 def get_remote_size(output_path, df, taxa, p_id=None, is_purge=False):
-    print(f"{p_id} - {len(df)}")
+    print(f"core_{p_id}, total: {len(df)}")
 
     tsv_path = f"{output_path}.{p_id}"
     if os.path.exists(tsv_path) and not is_purge:
-        print(f"get_remote_size_{p_id} : skip process")
         df = pd.read_csv(tsv_path, sep='\t')
         return df
 
     tsv_tmp_path = f"{tsv_path}.tmp"
-    df.to_csv(tsv_tmp_path, sep="\t", index=False)
-
-    print("get_remote_size")
+    df.to_csv(tsv_tmp_path, sep='\t', index=False)
 
     host = "ftp.ncbi.nlm.nih.gov"
     ftp_con = FTPConnection()
     ftp_con.set_host(host)
     ftp_con.connect()
-    try:
-        df = df.apply(lambda row: get_size(ftp_con, row, taxa, p_id), axis=1)
-    except:
-        print(tsv_path)
-        exit()
+
+    df = df.apply(lambda row: get_size(ftp_con, row, taxa, p_id), axis=1)
+
     ftp_con.close()
 
     list = ["assembly_accession", "taxid", "species_taxid", "organism_name", "infraspecific_name",

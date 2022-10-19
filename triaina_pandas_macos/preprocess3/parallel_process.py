@@ -11,6 +11,7 @@ import pandas as pd
 from joblib import delayed, Parallel
 from preprocess.FTPConnection import FTPConnection
 from preprocess.create_taxa_meta import download_summary, get_remote_size, get_remote_data
+import time
 
 
 def create_taxa_meta(taxa, n_procs, is_purge):
@@ -37,18 +38,30 @@ def download_taxa_data(output_path, df, n_procs, is_purge):
 
 
 if __name__ == '__main__':
+    pd.set_option('display.max_rows', None)
+    pd.set_option('display.max_columns', None)
+    pd.set_option('display.width', None)
+
     taxa_list = ["archaea", "fungi", "viral", "protozoa", "bacteria"]
     taxa_list = ["viral", "protozoa", "bacteria"]
     n_procs = multiprocessing.cpu_count()
     is_purge = False
 
     for taxa in taxa_list:
-        df, output_path = create_taxa_meta(taxa, n_procs, is_purge)
+        start = time.time()
+        try:
+            df, output_path = create_taxa_meta(taxa, n_procs, is_purge)
 
-        view = df[~df["is_downloaded"]]
-        df = download_taxa_data(output_path, view, n_procs, is_purge)
+            view = df[~df["is_downloaded"]]
+            df = download_taxa_data(output_path, view, n_procs, is_purge)
 
-        # print(df.loc[:,["local_size", "remote_size", "is_downloaded"]])
-        # print(len(df[~df["is_downloaded"]]))
+            # print(df.loc[:,["local_size", "remote_size", "is_downloaded"]])
+            print(len(df[~df["is_downloaded"]]))
+        except:
+            end = time.time()
+            print(f"{end-start:.3f} sec")
+
+        end = time.time()
+        print(f"{end-start:.3f} sec")
 
         break
