@@ -1,5 +1,5 @@
 '''
-Created on 19 Oct 2022
+Created on 20 Oct 2022
 
 @author: root
 '''
@@ -34,16 +34,16 @@ class FTPConnection:
             size = self.ftp.size(remote_path)
         except ftplib.all_errors as e:
             err_code = str(e)[:3]
-            print("ERROR : ", err_code, remote_path, end=" ")
+            print(f"Error[class get_size]: {str(e)}", end=" ")
             if (err_code == "421"):
-                print("Connection closed. Re-connect...")
+                print("Re-connect...")
                 self.connect()
                 size = self.ftp.size(remote_path)
             elif (err_code == "550"):
                 print("Not found file")
                 size = -1
             else:
-                print(str(e), "Re-connect...")
+                print("NEED ERR CHECK")
                 self.connect()
                 size = self.ftp_size(remote_path)
         return size
@@ -65,9 +65,16 @@ class FTPConnection:
                 try:
                     self.ftp.retrbinary(f"RETR {remote_path}", fin.write)
                 except ftplib.all_errors as e:
-                    print(e, "re-connect...")
-                    self.connect()
-                    self.ftp.retrbinary(f"RETR {remote_path}", fin.write)
+                    err_code = str(e)[:3]
+                    print(f"Error[class download]: {str(e)}", end=" ")
+                    if err_code == "421":
+                        print("Re-connect...")
+                        self.connect()
+                        self.ftp.retrbinary(f"RETR {remote_path}", fin.write)
+                    else:
+                        print("NEED ERR CHECK")
+                        self.connect()
+                        self.ftp.retrbinary(f"RETR {remote_path}", fin.write)
             local_size = os.path.getsize(output_path)
             if remote_size == local_size:
                 break
