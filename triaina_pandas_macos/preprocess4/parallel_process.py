@@ -1,5 +1,5 @@
 '''
-Created on 19 Oct 2022
+Created on 20 Oct 2022
 
 @author: root
 '''
@@ -51,22 +51,28 @@ if __name__ == '__main__':
     # taxa_list = ["archaea", "fungi", "viral", "protozoa" , "bacteria"]
     taxa_list = ["viral", "bacteria"]
     n_procs = multiprocessing.cpu_count()
-    is_purge = False
+    print(f"n_procs: {n_procs}")
+    is_purge = True
 
     for taxa in taxa_list:
-        start = time.time()
+
+        t1 = time.time()
         df, output_path = create_taxa_meta(taxa, n_procs, is_purge)
+        t2 = time.time()
+
+        print(f"{t2-t1:.3f} sec")
 
         view = df[~df["is_downloaded"]]
         print(f"Need download: {len(view)}")
 
+        t3 = time.time()
         df = download_taxa_data(output_path, view, n_procs, is_purge)
+        t4 = time.time()
 
         view = df[~df["is_downloaded"]]
         print(f"Not finished: {len(view)}")
 
         # print(df.loc[:,["local_size", "remote_size", "is_downloaded"]])
 
-        end = time.time()
-        print(f"{end-start:.3f} sec")
+        print(f"{t4-t1:.3f} sec")
         break

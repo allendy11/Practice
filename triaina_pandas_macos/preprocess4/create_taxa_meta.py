@@ -1,5 +1,5 @@
 '''
-Created on 19 Oct 2022
+Created on 20 Oct 2022
 
 @author: root
 '''
@@ -58,31 +58,39 @@ def get_size(ftp, row, df_len, taxa, p_id):
     output_path = row["local_path"]
     file_name = os.path.basename(output_path)
 
-    remote_dir = (row["ftp_path"].split(sep='/', maxsplit=3))[-1]
-    remote_path = f"{remote_dir}/{file_name}"
-
-    try:
-        remote_size = ftp.get_size(remote_path)
-    except:
-        print(f"error : {taxa}_{p_id}_{row.name} : {file_name}")
-    # if 0 == row.name % 100:
-    print(f"{taxa}_{p_id} {row.name}/{df_len} size: {remote_size} {remote_path}")
-
-    row["remote_path"] = remote_path
-    row["remote_size"] = remote_size
+    local_size = -1
+    remote_size = -1
 
     if not os.path.exists(output_path):
         row["is_downloaded"] = False
     else:
         local_size = os.path.getsize(output_path)
         row["local_size"] = local_size
-        row["is_downloaded"] = (remote_size == local_size)
+
+    remote_dir = (row["ftp_path"].split(sep='/', maxsplit=3))[-1]
+    remote_path = f"{remote_dir}/{file_name}"
+
+    try:
+        remote_size = ftp.get_size(remote_path)
+    except:
+        print(f"Error[get_size] : {taxa}_{p_id}_{row.name} : {file_name}")
+        remote_size = -1
+    # if 0 == row.name % 100:
+    print(f"[{(row.name/df_len)*100:.1f}%]\t[{taxa}_{p_id}]\t[{row.name}/{df_len}]\t[size:{local_size == remote_size} {local_size}/{remote_size}]\t[{file_name}]")
+
+    row["remote_path"] = remote_path
+    row["remote_size"] = remote_size
+
+    if -1 == remote_size or -1 == local_size:
+        row["is_downloaded"] == False
+    row["is_downloaded"] = (remote_size == local_size)
+
     return row
 
 
 def get_remote_size(output_path, df, taxa, p_id=None, is_purge=False):
-    if 14 != p_id:
-        return pd.DataFrame()
+    # if 14 != p_id:
+    #     return pd.DataFrame()
     print(f"core_{p_id}, total: {len(df)}")
 
     tsv_path = f"{output_path}.{p_id}"
@@ -116,9 +124,16 @@ def is_downloaded(ftp, row, taxa, df_len, p_id):
     remote_path = row["remote_path"]
     output_path = row["local_path"]
     remote_size = row["remote_size"]
+    file_name = os.path.basename(output_path)
 
-    ftp.download(output_path, remote_path, remote_size)
-    print(f"{taxa}_{p_id} {row.name}/{df_len} size: {remote_size} {remote_path}")
+    if remote_size == -1:
+        return row
+
+    try:
+        ftp.download(output_path, remote_path, remote_size)
+    except:
+        print(f"Error[is_download]: {taxa}_{p_id} {row.name} ${file_name}")
+    print(f"{(row.name/df_len)*100:.1f}% {taxa}_{p_id} {row.name}/{df_len} size: {remote_size} {remote_path}")
 
     row["is_downloaded"] = True
     return row
@@ -129,6 +144,7 @@ def get_remote_data(output_path, df, taxa, p_id=None, is_purge=False):
     # if os.path.exists(tsv_path) and not is_purge:
     #     print("download_taxa : skip process")
     #     return df
+    df.reset_index(inplace=True)
 
     host = "ftp.ncbi.nlm.nih.gov"
     ftp_con = FTPConnection()
