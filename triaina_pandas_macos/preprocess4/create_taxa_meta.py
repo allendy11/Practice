@@ -18,7 +18,7 @@ def set_local_path(ftp_path, taxa):
 
 
 def modify_summary(output_path, taxa):
-    df = pd.read_csv(output_path, sep='\t', skiprows=1)
+    df = pd.read_csv(output_path, sep='\t', skiprows=1, low_memory=False)
     df.rename(
         columns={"# assembly_accession": "assembly_accession"}, inplace=True)
     df = df[df["ftp_path"] != "na"].copy()
@@ -76,22 +76,23 @@ def get_size(ftp, row, df_len, taxa, p_id):
         print(f"Error[get_size] : {taxa}_{p_id}_{row.name} : {file_name}")
         remote_size = -1
     # if 0 == row.name % 100:
-    print(f"[{(row.name/df_len)*100:.1f}%]\t[{taxa}_{p_id}]\t[{row.name}/{df_len}]\t[size:{local_size == remote_size} {local_size}/{remote_size}]\t[{file_name}]")
+    print(f"[get_size]\t[{(row.name/df_len)*100:.1f}%]\t[{taxa}_{p_id}]\t[{row.name}/{df_len}]\t[{local_size == remote_size} {local_size}/{remote_size}]\t[{file_name}]")
 
     row["remote_path"] = remote_path
     row["remote_size"] = remote_size
 
     if -1 == remote_size or -1 == local_size:
-        row["is_downloaded"] == False
+        row["is_downloaded"] = False
     row["is_downloaded"] = (remote_size == local_size)
 
     return row
 
 
 def get_remote_size(output_path, df, taxa, p_id=None, is_purge=False):
-    # if 14 != p_id:
+    # if 42 > p_id:
     #     return pd.DataFrame()
-    print(f"core_{p_id}, total: {len(df)}")
+    df_len = len(df)
+    print(f"core_{p_id}, total: {df_len}")
 
     tsv_path = f"{output_path}.{p_id}"
     if os.path.exists(tsv_path) and not is_purge:
@@ -133,13 +134,14 @@ def is_downloaded(ftp, row, taxa, df_len, p_id):
         ftp.download(output_path, remote_path, remote_size)
     except:
         print(f"Error[is_download]: {taxa}_{p_id} {row.name} ${file_name}")
-    print(f"{(row.name/df_len)*100:.1f}% {taxa}_{p_id} {row.name}/{df_len} size: {remote_size} {remote_path}")
 
+    local_size = os.path.getsize(output_path)
+    print(f"[is_downloaded]\t[{(row.name/df_len)*100:.1f}%]\t[{taxa}_{p_id}]\t[{row.name}/{df_len}]\t[{local_size == remote_size} {local_size}/{remote_size}]\t[{file_name}]")
     row["is_downloaded"] = True
     return row
 
 
-def get_remote_data(output_path, df, taxa, p_id=None, is_purge=False):
+def get_remote_data(df, taxa, p_id=None, is_purge=False):
     # tsv_path = f"{output_path}.{p_id}"
     # if os.path.exists(tsv_path) and not is_purge:
     #     print("download_taxa : skip process")
@@ -160,11 +162,12 @@ def get_remote_data(output_path, df, taxa, p_id=None, is_purge=False):
 
 
 if __name__ == '__main__':
-    is_purge = False
-    taxa = "archaea"
-    summary_output_path = f"/home/neuroears/data_mount/study/data/NCBI_DH/{taxa}/assembly_summary.txt"
-    taxa_output_dir = f"/home/neuroears/data_mount/study/data/NCBI/{taxa}"
-
-    df = download_summary(summary_output_path, taxa, is_purge)
-
-    df = get_remote_size(summary_output_path, df, p_id=None, is_purge=is_purge)
+    pass
+    # is_purge = False
+    # taxa = "archaea"
+    # summary_output_path = f"/home/neuroears/data_mount/study/data/NCBI_DH/{taxa}/assembly_summary.txt"
+    # taxa_output_dir = f"/home/neuroears/data_mount/study/data/NCBI/{taxa}"
+    #
+    # df = download_summary(summary_output_path, taxa, is_purge)
+    #
+    # df = get_remote_size(summary_output_path, df, p_id=None, is_purge=is_purge)
