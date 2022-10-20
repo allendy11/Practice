@@ -31,7 +31,7 @@ def create_taxa_meta(taxa, n_procs, is_purge):
 def download_taxa_data(output_path, df, n_procs, is_purge):
     dfs = np.array_split(df, n_procs)
     result_dfs = Parallel(n_jobs=n_procs)(delayed(get_remote_data)(
-        output_path, p_df, p_id, is_purge) for p_id, p_df in enumerate(dfs))
+        output_path, p_df, taxa, p_id, is_purge) for p_id, p_df in enumerate(dfs))
     gathered_df = pd.concat(result_dfs, axis=0)
     # print(gathered_df.loc[:,"local_path": "is_downloaded"])
     return gathered_df
@@ -41,27 +41,32 @@ if __name__ == '__main__':
     pd.set_option('display.max_rows', None)
     pd.set_option('display.max_columns', None)
     pd.set_option('display.width', None)
+    os.environ["OMP_NUM_THREADS"] = "1"  # export OMP_NUM_THREADS=4
+    os.environ["OPENBLAS_NUM_THREADS"] = "1"  # export OPENBLAS_NUM_THREADS=4
+    os.environ["MKL_NUM_THREADS"] = "1"  # export MKL_NUM_THREADS=6
+    # export VECLIB_MAXIMUM_THREADS=4
+    os.environ["VECLIB_MAXIMUM_THREADS"] = "1"
+    os.environ["NUMEXPR_NUM_THREADS"] = "1"  # export NUMEXPR_NUM_THREADS=6
 
-    taxa_list = ["archaea", "fungi", "viral", "protozoa", "bacteria"]
-    taxa_list = ["viral", "protozoa", "bacteria"]
+    # taxa_list = ["archaea", "fungi", "viral", "protozoa" , "bacteria"]
+    taxa_list = ["viral", "bacteria"]
     n_procs = multiprocessing.cpu_count()
     is_purge = False
 
     for taxa in taxa_list:
         start = time.time()
-        try:
-            df, output_path = create_taxa_meta(taxa, n_procs, is_purge)
+        df, output_path = create_taxa_meta(taxa, n_procs, is_purge)
 
-            view = df[~df["is_downloaded"]]
-            df = download_taxa_data(output_path, view, n_procs, is_purge)
+        view = df[~df["is_downloaded"]]
+        print(f"Need download: {len(view)}")
 
-            # print(df.loc[:,["local_size", "remote_size", "is_downloaded"]])
-            print(len(df[~df["is_downloaded"]]))
-        except:
-            end = time.time()
-            print(f"{end-start:.3f} sec")
+        df = download_taxa_data(output_path, view, n_procs, is_purge)
+
+        view = df[~df["is_downloaded"]]
+        print(f"Not finished: {len(view)}")
+
+        # print(df.loc[:,["local_size", "remote_size", "is_downloaded"]])
 
         end = time.time()
         print(f"{end-start:.3f} sec")
-
         break

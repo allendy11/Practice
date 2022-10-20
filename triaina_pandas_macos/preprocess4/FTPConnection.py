@@ -33,17 +33,31 @@ class FTPConnection:
         try:
             size = self.ftp.size(remote_path)
         except ftplib.all_errors as e:
-            print(e, "re-connect...")
-            self.connect()
-            size = self.ftp.size(remote_path)
+            err_code = str(e)[:3]
+            print("ERROR : ", err_code, remote_path, end=" ")
+            if (err_code == "421"):
+                print("Connection closed. Re-connect...")
+                self.connect()
+                size = self.ftp.size(remote_path)
+            elif (err_code == "550"):
+                print("Not found file")
+                size = -1
+            else:
+                print(str(e), "Re-connect...")
+                self.connect()
+                size = self.ftp_size(remote_path)
         return size
 
-    def download(self, output_path, remote_path):
+    # put remote_size 10.19 10:11am
+    def download(self, output_path, remote_path, remote_size=-1):
         local_size = None
+        if -1 == remote_size:
+            remote_size = self.get_size(remote_path)
         if os.path.exists(output_path):
             local_size = os.path.getsize(output_path)
-        remote_size = self.get_size(remote_path)
-        if remote_size == local_size:
+            if remote_size == local_size:
+                return
+        if remote_size == -1:
             return
 
         while True:

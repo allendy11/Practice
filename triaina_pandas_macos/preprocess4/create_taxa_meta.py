@@ -112,19 +112,19 @@ def get_remote_size(output_path, df, taxa, p_id=None, is_purge=False):
     return df
 
 
-def is_downloaded(ftp, row):
-    if row["is_downloaded"]:
-        return row
+def is_downloaded(ftp, row, taxa, df_len, p_id):
     remote_path = row["remote_path"]
     output_path = row["local_path"]
     remote_size = row["remote_size"]
 
     ftp.download(output_path, remote_path, remote_size)
+    print(f"{taxa}_{p_id} {row.name}/{df_len} size: {remote_size} {remote_path}")
+
     row["is_downloaded"] = True
     return row
 
 
-def get_remote_data(output_path, df, p_id=None, is_purge=False):
+def get_remote_data(output_path, df, taxa, p_id=None, is_purge=False):
     # tsv_path = f"{output_path}.{p_id}"
     # if os.path.exists(tsv_path) and not is_purge:
     #     print("download_taxa : skip process")
@@ -135,7 +135,10 @@ def get_remote_data(output_path, df, p_id=None, is_purge=False):
     ftp_con.set_host(host)
     ftp_con.connect()
 
-    df = df.apply(lambda row: is_downloaded(ftp_con, row), axis=1)
+    df = df.apply(lambda row: is_downloaded(
+        ftp_con, row, taxa, len(df), p_id), axis=1)
+
+    ftp_con.close()
 
     return df
 
