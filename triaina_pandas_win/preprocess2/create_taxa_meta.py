@@ -23,6 +23,9 @@ def set_local_path(ftp_path, taxa):
 def modify_taxa_meta(output_path, taxa):
     df = pd.read_csv(output_path, sep='\t', skiprows=1, low_memory=False)
     df.rename(columns={"# assembly_accession": "assembly_accession"}, inplace=True)
+    
+    df = df[df["ftp_path"] != 'na'].copy()
+    
     df["http_path"] = df["ftp_path"]
     df["ftp_path"] = df["ftp_path"].str.replace("http", "ftp")
     df["local_path"] = df["ftp_path"].map(lambda ftp_path: set_local_path(ftp_path, taxa))
