@@ -45,8 +45,9 @@ class FTPConnection(object):
     def download(self, output_path, remote_path, remote_size=None):
         if remote_size == None:
             remote_size = self.get_size(remote_path)
-        count = 0
+        count = 1
         while True:
+            print(f"try: {count}/10")
             with open(output_path, 'wb') as fin:
                 try:
                     self.ftp.retrbinary(f"RETR {remote_path}", fin.write)
