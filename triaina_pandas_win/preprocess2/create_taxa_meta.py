@@ -151,7 +151,7 @@ def is_downloaded(row, ftp_con, df_len, taxa, p_id):
         return row
     
     local_size = os.path.getsize(output_path)
-    print(f"[get_remote_size] {(row.name/df_len)*100:.1f}% | {taxa}-{p_id} | {row.name}/{df_len} | {local_size}/{remote_size} | {remote_path}")
+    print(f"[is_downloaded] {(row.name/df_len)*100:.1f}% | {taxa}-{p_id} | {row.name}/{df_len} | {local_size}/{remote_size} | {remote_path}")
 
     row["is_downloaded"] = True
     
