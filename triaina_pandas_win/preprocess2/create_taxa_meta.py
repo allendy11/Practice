@@ -104,10 +104,11 @@ def set_remote_size(output_path, df, taxa, p_id, is_purge):
     print(f"[set_remote_size] {taxa}-{p_id}-{df_len}")
     tsv_path = f"{output_path}.{p_id}"
     if os.path.exists(tsv_path) and not is_purge:
+        print(f"[set_remote_size] {taxa}-{p_id}-{df_len} | skip")
         df = pd.read_csv(tsv_path, sep='\t')
         return df
-    
-    df.reset_index(inplace=True)
+    print(f"[set_remote_size] {taxa}-{p_id}-{df_len}")
+    # df.reset_index(inplace=True)
     
     tsv_tmp_path = f"{tsv_path}.tmp"
     df.to_csv(tsv_tmp_path, sep='\t', index=False)

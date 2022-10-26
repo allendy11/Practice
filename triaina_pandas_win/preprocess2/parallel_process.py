@@ -22,7 +22,7 @@ def meta_data_process(taxa, n_procs, is_purge):
     return gathered_df
 
 def taxa_data_process(df, n_procs, is_purge):
-    dfs = np.array_split(df, n_procs)
+    dfs = np.array_split(df, n_procs*100)
     result_dfs = Parallel(n_jobs=n_procs)(delayed(download_taxa_data)(p_df, taxa, p_id, is_purge) for p_id, p_df in enumerate(dfs))
     gathered_df = pd.concat(result_dfs, axis=0)
     return gathered_df
@@ -46,13 +46,13 @@ if __name__ == '__main__':
         # print(df.head(1))
         print(f"{t2-t1:.3f} sec")
         
-        df_ = df[~df["is_downloaded"]]
-        
+        df_ = df[df["is_downloaded"] == False]
+        print(f"number of file : f{df_}")
         # t3 = time()
         taxa_data_process(df_, n_procs, is_purge)
-        # t4 = time()
+        t4 = time()
         #
-        # print(f"{t4-t1:.3f} sec")
+        print(f"{t4-t1:.3f} sec")
         
         # print(df.head(1))
         break
