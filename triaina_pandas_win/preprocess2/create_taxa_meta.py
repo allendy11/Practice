@@ -71,7 +71,6 @@ def get_remote_size(row, ftp_con, df_len, taxa, p_id):
         local_size = os.path.getsize(output_path)
     else:
         local_size = -1
-    row["local_size"] = local_size
     
     try:
         remote_size = ftp_con.get_size(remote_path)
@@ -96,6 +95,11 @@ def get_remote_size(row, ftp_con, df_len, taxa, p_id):
 
 
 def set_remote_size(output_path, df, taxa, p_id, is_purge):
+    # if p_id > 400:
+    #     print(f"skip: {p_id}")
+    #     return pd.DataFrame()
+    #
+
     df_len = len(df)
     print(f"[set_remote_size] {taxa}-{p_id}-{df_len}")
     tsv_path = f"{output_path}.{p_id}"
@@ -117,15 +121,55 @@ def set_remote_size(output_path, df, taxa, p_id, is_purge):
     
     ftp_con.close()
     
-    lst = ["assembly_accession", "taxid", "species_taxid", "organism_name", "infraspecific_name", "ftp_path", "local_path", "remote_path", "local_size", "remote_size", "is_downloaded"]
+    lst = ["assembly_accession", "taxid", "species_taxid", "organism_name", "infraspecific_name", "ftp_path", "local_path", "remote_path", "remote_size", "is_downloaded"]
     view = df[lst]
     df = view.copy()
     df.to_csv(tsv_path, sep='\t', index=False)
     return df
 
-def download_taxa_data(df):
-    pass
 
+def is_downloaded(row, ftp_con, df_len, taxa, p_id):
+    remote_path = row["remote_path"]
+    output_path = row["local_path"]
+    local_size = os.path.getsize(output_path)
+    remote_size = row["remote_size"]
+    
+    if local_size == remote_size:
+        print("Downloaded already")
+        return row
+    
+    if remote_size == -1:
+        print("Not found remote file")
+        return row
+    
+    try:
+        ftp_con.download(output_path, remote_path, remote_size)
+    except:
+        print(f"Err : {taxa}-{p_id} {remote_path}")
+        return row
+    
+    local_size = os.path.getsize(output_path)
+    print(f"[get_remote_size] {(row.name/df_len)*100:.1f}% | {taxa}-{p_id} | {row.name}/{df_len} | {local_size}/{remote_size} | {remote_path}")
+
+    row["is_downloaded"] = True
+    
+    return row
+
+def download_taxa_data(df, taxa, p_id, is_purge):
+    df_len = len(df)
+    df.reset_index(inplace=True)
+    
+    host = "ftp.ncbi.nlm.nih.gov"
+    ftp_con = FTPConnection()
+    ftp_con.set_host(host)
+    ftp_con.connect()
+    
+    df = df.apply(lambda row : is_downloaded(row, ftp_con, df_len, taxa, p_id), axis=1)
+    
+    ftp_con.close()
+
+    return df
+    
 if __name__ == '__main__':
     pass
     # taxa_list = ["archaea", "fungi", "viral", "protozoa", "bacteria"]
