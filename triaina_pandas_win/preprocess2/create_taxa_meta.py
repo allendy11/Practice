@@ -132,17 +132,19 @@ def set_remote_size(output_path, df, taxa, p_id, is_purge):
 def is_downloaded(row, ftp_con, df_len, taxa, p_id):
     remote_path = row["remote_path"]
     output_path = row["local_path"]
-    local_size = os.path.getsize(output_path)
-    remote_size = row["remote_size"]
     
-    if local_size == remote_size:
-        print("Downloaded already")
-        return row
+    local_size = -1
+    if os.path.exists(output_path):
+        local_size = os.path.getsize(output_path)
+    remote_size = row["remote_size"]
     
     if remote_size == -1:
         print("Not found remote file")
         return row
-    
+    if local_size == remote_size:
+        print("Downloaded already")
+        return row
+        
     try:
         ftp_con.download(output_path, remote_path, remote_size)
     except:
