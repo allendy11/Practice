@@ -142,6 +142,7 @@ def is_downloaded(row, ftp_con, df_len, taxa, p_id):
         return row
     if local_size == remote_size:
         print("Downloaded already")
+        row["is_downloaded"] = True
         return row
         
     try:
