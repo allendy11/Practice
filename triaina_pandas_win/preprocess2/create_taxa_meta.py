@@ -7,7 +7,6 @@ Created on Oct 24, 2022
 import pandas as pd
 import os
 from preprocess.FTPConnection import FTPConnection
-from unittest.mock import inplace
 
 def set_local_path(ftp_path, taxa):
     local_dir = f"/home/neuroears/data_mount/study/data/NCBI/{taxa}"
