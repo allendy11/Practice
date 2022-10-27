@@ -47,6 +47,7 @@ if __name__ == '__main__':
         print(f"{t2-t1:.3f} sec")
         
         df_ = df[df["is_downloaded"] == False]
+        # print(df_["is_downloaded"])
         # t3 = time()
         taxa_data_process(df_, n_procs, is_purge)
         t4 = time()

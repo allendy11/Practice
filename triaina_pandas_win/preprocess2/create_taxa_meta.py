@@ -7,7 +7,6 @@ Created on Oct 24, 2022
 import pandas as pd
 import os
 from preprocess.FTPConnection import FTPConnection
-from unittest.mock import inplace
 
 def set_local_path(ftp_path, taxa):
     local_dir = f"/home/neuroears/data_mount/study/data/NCBI/{taxa}"
@@ -143,16 +142,17 @@ def is_downloaded(row, ftp_con, df_len, taxa, p_id):
         return row
     if local_size == remote_size:
         print("Downloaded already")
+        row["is_downloaded"] = True
         return row
         
     try:
-        ftp_con.download(output_path, remote_path, remote_size)
+        ftp_con.download(output_path, remote_path, remote_size, p_id, row.name)
     except:
         print(f"Err : {taxa}-{p_id} {remote_path}")
         return row
     
     local_size = os.path.getsize(output_path)
-    print(f"[get_remote_size] {(row.name/df_len)*100:.1f}% | {taxa}-{p_id} | {row.name}/{df_len} | {local_size}/{remote_size} | {remote_path}")
+    print(f"[is_downloaded] {(row.name/df_len)*100:.1f}% | {taxa}-{p_id} | {row.name}/{df_len} | {local_size}/{remote_size} | {remote_path}")
 
     row["is_downloaded"] = True
     
