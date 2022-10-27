@@ -146,7 +146,7 @@ def is_downloaded(row, ftp_con, df_len, taxa, p_id):
         return row
         
     try:
-        ftp_con.download(output_path, remote_path, remote_size)
+        ftp_con.download(output_path, remote_path, remote_size, p_id, row.name)
     except:
         print(f"Err : {taxa}-{p_id} {remote_path}")
         return row
