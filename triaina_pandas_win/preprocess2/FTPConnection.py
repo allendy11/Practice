@@ -14,6 +14,7 @@ class FTPConnection(object):
         self.host = host
     
     def connect(self):
+        print("[FTP connecting...]")
         self.ftp = ftplib.FTP(self.host)
         self.login()
         print("[FTP connected]")
@@ -48,10 +49,17 @@ class FTPConnection(object):
         count = 1
         while True:
             print(f"[{p_id}_{index}] try: {count}/10")
-            with open(output_path, 'wb') as fin:
+            local_size = os.path.getsize(output_path)
+            if local_size == remote_size:
+                print(f"[{p_id}_{index}] Downloaded already", end=" ")
+                break
+            with open(output_path, 'wb') as fin:    
                 try:
                     self.ftp.retrbinary(f"RETR {remote_path}", fin.write)
                 except ftplib.all_errors as e:
+                    # print(f"[{p_id}_{index}] [Error]: ", e)
+                    # self.connect()
+                    # self.ftp.retrbinary(f"RETR {remote_path}", fin.write)
                     err_code = str(e)[:3]
                     if err_code == "421":
                         print(f"[{p_id}_{index}] [Err 421]: ", e, "re-connecting...")
@@ -61,6 +69,9 @@ class FTPConnection(object):
                         print(f"[{p_id}_{index}] [Err 550]: ", e)
                     else:
                         print(f"[{p_id}_{index}] [Err unknown]: ", e)
+                        self.connect()
+                        self.ftp.retrbinary(f"RETR {remote_path}", fin.write)
+                        
             local_size = os.path.getsize(output_path)
             if local_size == remote_size:
                 print(f"[{p_id}_{index}] Success download", end=" ")
@@ -68,6 +79,7 @@ class FTPConnection(object):
             if count == 10:
                 print(f"[{p_id}_{index}] Failed download", end=" ")
                 break
+            print(f"[{p_id}_{index}] Re-try", end=" ")
             print(f"[{p_id}_{index}] [local_size] : {local_size}, [remote_size]: {remote_size}")
             count +=1
             time.sleep(5)
