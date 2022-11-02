@@ -63,9 +63,9 @@ def get_remote_size(row, ftp_con, df_len, taxa, id):
     remote_size = -1
     try:
         remote_size = ftp_con.get_size(remote_path)
-        print(f"[get_remote_size] SUCCESS : Core_{id} | {(row.name/df_len)*100:.1f}% | {row.name}/{df_len} | remote_size: {remote_size}")
+        print(f"[get_remote_size] SUCCESS : Core_{id} | {row.name}/{df_len} | {(row.name/df_len)*100:.1f}% | remote_size: {remote_size}")
     except:
-        print(f"[get_remote_size] FAIL : Core_{id} | {(row.name/df_len)*100:.1f}% | {row.name}/{df_len} | remote_size: {remote_size}")
+        print(f"[get_remote_size] FAIL : Core_{id} | {row.name}/{df_len} | {(row.name/df_len)*100:.1f}% | remote_size: {remote_size}")
         
     row["remote_size"] = remote_size
     
@@ -119,10 +119,10 @@ def is_downloaded(row, ftp_con, df_len, taxa, id):
     remote_size = row["remote_size"]
     
     if remote_size == -1:
-        print(f"[is_downloaded] FAIL : Core_{id} | {(row.name/df_len)*100:.1f}% | {row.name}/{df_len} | local_size: {local_size} | remove_size: {remote_size} | error: Not found file on remote_path")
+        print(f"[is_downloaded] FAIL : Core_{id} | {row.name}/{df_len} | {(row.name/df_len)*100:.1f}% | local_size: {local_size} | remove_size: {remote_size} | error: Not found file on remote_path")
         return row;
     if local_size == remote_size:
-        print(f"[is_downloaded] SKIP : Core_{id} | {(row.name/df_len)*100:.1f}% | {row.name}/{df_len} | local_size: {local_size} | remove_size: {remote_size}")
+        print(f"[is_downloaded] SKIP : Core_{id} | {row.name}/{df_len} | {(row.name/df_len)*100:.1f}% | local_size: {local_size} | remove_size: {remote_size}")
         row["is_downloaded"] = True
         return row
     
@@ -130,16 +130,16 @@ def is_downloaded(row, ftp_con, df_len, taxa, id):
     try:
         result_data = ftp_con.download(output_path, remote_path, local_size, remote_size)       
     except:
-        print(f"[is_downloaded] ERROR : Core_{id} | {(row.name/df_len)*100:.1f}% | {row.name}/{df_len} | local_size: {local_size} | remove_size: {remote_size}")            
+        print(f"[is_downloaded] ERROR : Core_{id} | {row.name}/{df_len} | {(row.name/df_len)*100:.1f}% | local_size: {local_size} | remove_size: {remote_size}")            
     
     local_size = -1
     if os.path.exists(output_path):
         local_size = os.path.getsize(output_path)
     
     if result_data['result']:
-        print(f"[is_downloaded] SUCCESS : Core_{id} | {(row.name/df_len)*100:.1f}% | {row.name}/{df_len} | local_size: {local_size} | remove_size: {remote_size}")            
+        print(f"[is_downloaded] SUCCESS : Core_{id} | {row.name}/{df_len} | {(row.name/df_len)*100:.1f}% | local_size: {local_size} | remove_size: {remote_size}")            
     else:
-        print(f"[is_downloaded] FAIL : Core_{id} | {(row.name/df_len)*100:.1f}% | {row.name}/{df_len} | local_size: {local_size} | remove_size: {remote_size} | error: {result_data['error']}")
+        print(f"[is_downloaded] FAIL : Core_{id} | {row.name}/{df_len} | {(row.name/df_len)*100:.1f}% | local_size: {local_size} | remove_size: {remote_size} | error: {result_data['error']}")
     
     n = round(random(),3) * 5
     sleep(n) 
