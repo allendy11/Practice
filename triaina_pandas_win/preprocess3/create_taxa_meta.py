@@ -43,8 +43,23 @@ def create_taxa_meta(output_path, taxa, is_purge):
         print(f"[create_assembly_summay] : end")
         return df
 
-        
+    output_dir = os.path.dirname(output_path)
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+    
+    host = "ftp.ncbi.nlm.nih.gov"
+    ftp_con = FTPConnection()
+    ftp_con.set_host(host)
+    ftp_con.connect()
+    
+    remote_path = f"genomes/genbank/{taxa}/assembly_summary.txt"
+    ftp_con.download(output_path, remote_path)
+    ftp_con.close()
+    
+    df = modify_taxa_meta(output_path, taxa)
     print(f"[create_assembly_summay] : end")
+    
+    return df
 
 
 def get_remote_size(row, ftp_con, df_len, taxa, id):   
