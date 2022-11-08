@@ -10,6 +10,7 @@ import multiprocessing as mp
 from joblib import delayed, Parallel
 from preprocess.FTPConnection import FTPConnection
 from tqdm import tqdm
+from time import time
 
 def set_local_path(ftp_path, taxa):
     local_dir = f"/home/neuroears/data_mount/study/data/NCBI/{taxa}"
@@ -116,11 +117,13 @@ if __name__ == '__main__':
         df = gathered_df[gathered_df["is_downloaded"] == False]
         dfs = np.array_split(df, n_procs*1000)
         
+        t0 = time()
         for id, df in enumerate(dfs):
-            if id > 82:
+            if id >= 0:
                 count = 1
+                t1 = time()
                 while df.shape[0] != df["is_downloaded"].sum():
-                    result = Parallel(n_jobs=4)(delayed(download_taxa_data)(p_id, row, id) for p_id, row in enumerate(df.values))
+                    result = Parallel(n_jobs=8)(delayed(download_taxa_data)(p_id, row, id) for p_id, row in enumerate(df.values))
                     df["is_downloaded"] = result
                     sum = df["is_downloaded"].sum()
                     print(f"{sum}/{df.shape[0]}")
@@ -128,5 +131,8 @@ if __name__ == '__main__':
                         break
                     print(f"tried: {count} ")
                     count += 1
+                t2 = time()
+                print(f"{t2-t1:.3f}sec | {t2-t0:.3f}sec")
             else: 
                 print(f"{id}: skip")
+            
