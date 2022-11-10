@@ -14,7 +14,7 @@ class FTPConnection(object):
         self.host = host
     
     def connect(self):
-        self.ftp = ftplib.FTP(self.host)
+        self.ftp = ftplib.FTP("ftp.ncbi.nlm.nih.gov")
         self.login()
     
     def login(self):
@@ -34,6 +34,7 @@ class FTPConnection(object):
                 size = self.ftp.size(path)
             else:
                 print(e)
+                pass
         return size
     
     def download(self, output_path, remote_path):
