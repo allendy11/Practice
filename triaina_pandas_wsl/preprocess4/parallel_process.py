@@ -73,9 +73,8 @@ def download_taxa_data(p_id, row, id):
 
     try:    
         ftp_con.download(output_path, remote_path)
-    except Exception:
-        import traceback
-        traceback.print_exc()
+    except:
+        print(f"error | {id}-{p_id} | {local_size} | {remote_size} | {local_size == remote_size} | {remote_path}")
         pass
         
     if os.path.exists(output_path):
@@ -109,21 +108,26 @@ if __name__ == '__main__':
     n_procs = mp.cpu_count() # 8 
     
     for taxa in taxa_list:
+        print(f"create_taxa_meta : start")
         df = create_taxa_meta(taxa)
+        print(f"create_taxa_meta : end")
+        print(f"create_meta_tsv : start")
         dfs = np.array_split(df, n_procs *100)
-        result_dfs = Parallel(n_jobs=4)(delayed(create_meta_tsv)(p_id, p_df) for p_id, p_df in tqdm(enumerate(dfs)))
+        result_dfs = Parallel(n_jobs=6)(delayed(create_meta_tsv)(p_id, p_df) for p_id, p_df in tqdm(enumerate(dfs)))
         gathered_df = pd.concat(result_dfs, axis=0)
-        
+        print(f"create_meta_tsv : end")
+        print(f"download_taxa_data : start")
+
         df = gathered_df[gathered_df["is_downloaded"] == False]
-        dfs = np.array_split(df, n_procs*1000)
+        dfs = np.array_split(df, n_procs*300)
         
         t0 = time()
         for id, df in enumerate(dfs):
-            if id >= 0:
+            if id >= 279:
                 count = 1
                 t1 = time()
                 while df.shape[0] != df["is_downloaded"].sum():
-                    result = Parallel(n_jobs=8)(delayed(download_taxa_data)(p_id, row, id) for p_id, row in enumerate(df.values))
+                    result = Parallel(n_jobs=6)(delayed(download_taxa_data)(p_id, row, id) for p_id, row in enumerate(df.values))
                     df["is_downloaded"] = result
                     sum = df["is_downloaded"].sum()
                     print(f"{sum}/{df.shape[0]}")
@@ -135,4 +139,5 @@ if __name__ == '__main__':
                 print(f"{t2-t1:.3f}sec | {t2-t0:.3f}sec")
             else: 
                 print(f"{id}: skip")
+        print(f"download_taxa_data : end")
             
